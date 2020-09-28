@@ -11,6 +11,9 @@ class PBColors {
   static const ui_01 = Color(0xFFFFFFFF);
   static const ui_02 = Color(0xFF888888);
   static const ui_03 = Color(0xFF3A6471);
+
+  static const footer_01 = Color(0xFF090b0b);
+  static const footer_02 = Color(0xFF555555);
 }
 
 TextTheme pbTextTheme = TextTheme(

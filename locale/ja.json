@@ -61,5 +61,14 @@
   "CONFIRMED": "CONFIRMED",
   "STABLE": "STABLE",
   "swap_title": "Swap",
-  "swap_info": "Swap Information"
+  "swap_info": "Swap Information",
+  "decode_a_tx": "Decode A Transaction",
+  "tx_hex": "Transaction Hex",
+  "network": "Network",
+  "decode_tx": "Decode Transaction",
+  "we_r_social": "We are social",
+  "fork_me": "Fork me on GitHub",
+  "power_by": "Power by ",
+  "pb_web_services": "PocketBank Web Services",
+  "copyright": " © 2020 - PocketBank"
 }

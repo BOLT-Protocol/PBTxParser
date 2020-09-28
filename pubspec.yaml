@@ -31,6 +31,7 @@ dependencies:
   # 
   intl: ^0.16.1
   decimal: ^0.3.0
+  url_launcher: ^5.7.2
   # Bloc
   flutter_bloc: ^6.0.5
   bloc: ^6.0.3
