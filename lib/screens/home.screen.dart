@@ -123,14 +123,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                 maxLines: 100,
                               ),
                             ),
-                            // Container(
-                            //   padding: EdgeInsets.symmetric(vertical: 8),
-                            //   width: double.infinity,
-                            //   child: Text(
-                            //     t('network'),
-                            //     textAlign: TextAlign.start,
-                            //   ),
-                            // ),
                             Container(
                               margin: EdgeInsets.symmetric(vertical: 16),
                               child: RaisedButton(
