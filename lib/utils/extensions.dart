@@ -24,7 +24,7 @@ const int OP_CODESEPARATOR = 0xab;
 final Base58 base58 = Base58();
 final Base58 base58Xrp = Base58.xrp();
 
-enum ScriptType { P2PK, P2PKH, P2SH, P2WPKH }
+enum ScriptType { P2PK, P2PKH, P2SH, P2WPKH, NULL }
 
 extension ScriptTypeExt on ScriptType {
   String get name {
@@ -40,6 +40,9 @@ extension ScriptTypeExt on ScriptType {
         break;
       case ScriptType.P2WPKH:
         return "pay-to-witness-pubkey-hash";
+        break;
+      case ScriptType.NULL:
+        return "null-data";
         break;
       default:
         return null;
@@ -176,73 +179,75 @@ extension Uint8ListExt on Uint8List {
   }
 }
 
-Map<String, dynamic> scriptToPubkeyHash(dynamic script) {
-  Uint8List buffer = toBuffer(script);
-  Uint8List pubkeyHash;
-  ScriptType scriptType;
-  if (buffer.isP2pkhScript()) {
-    /**
+extension ListExt<T> on List<int> {
+  Map<String, dynamic> scriptToPubkeyHash() {
+    Uint8List buffer = toBuffer(this);
+    Uint8List pubkeyHash;
+    ScriptType scriptType;
+    if (buffer.isP2pkhScript()) {
+      /**
     pay-to-pubkey-hash
     scriptPubKey: OP_DUP OP_HASH160 <pubKeyHash> OP_EQUALVERIFY OP_CHECKSIG
     (76 a9 14 <pubkeyHash> 88 ac)
     scriptSig: <sig> <pubKey>
   */
-    scriptType = ScriptType.P2PKH;
-    pubkeyHash = toBuffer(buffer.sublist(3, buffer.length - 2));
-  } else if (buffer.isP2pkScript()) {
-    /**
+      scriptType = ScriptType.P2PKH;
+      pubkeyHash = toBuffer(buffer.sublist(3, buffer.length - 2));
+    } else if (buffer.isP2pkScript()) {
+      /**
     pay-to-pubkey
     scriptPubKey: <pubKey> OP_CHECKSIG
     (<pubkey> ac)
     scriptSig: <sig>
     */
-    Uint8List pubkey =
-        compressedPubKey(toBuffer(buffer.sublist(0, buffer.length - 1)));
-    scriptType = ScriptType.P2PK;
-    pubkeyHash = toHASH160(pubkey);
-  } else if (buffer.isP2shScript()) {
-    /**
+      Uint8List pubkey =
+          compressedPubKey(toBuffer(buffer.sublist(0, buffer.length - 1)));
+      scriptType = ScriptType.P2PK;
+      pubkeyHash = toHASH160(pubkey);
+    } else if (buffer.isP2shScript()) {
+      /**
     pay-to-script-hash
     scriptPubKey: OP_HASH160 <20-byte-hash-value> OP_EQUAL
     scriptSig: <sig> <20-byte-hash-value>
                (0xa914{20-byte-script-hash}87)
     */
-    scriptType = ScriptType.P2SH;
-    pubkeyHash = toBuffer(buffer.sublist(2, buffer.length - 1));
-  } else if (buffer.isP2wpkhScript()) {
-    /**
+      scriptType = ScriptType.P2SH;
+      pubkeyHash = toBuffer(buffer.sublist(2, buffer.length - 1));
+    } else if (buffer.isP2wpkhScript()) {
+      /**
     pay-to-witness-pubkey-hash
     witness: <signature> <pubkey>
     scriptSig: (empty)
     scriptPubKey: 0 <20-byte-key-hash>
                   (0x0014{20-byte-key-hash})
     */
-    scriptType = ScriptType.P2WPKH;
-    pubkeyHash = toBuffer(buffer.sublist(2));
-  } else {
-    pubkeyHash = null;
-  }
-  return {'type': scriptType, 'data': pubkeyHash};
-}
-
-String scriptToAddress(dynamic script) {
-  //TODO network && prefix
-  Map<String, dynamic> hash = scriptToPubkeyHash(script);
-  ScriptType type = hash["type"];
-  String address;
-  switch (type) {
-    case ScriptType.P2PK:
-    case ScriptType.P2PKH:
-    case ScriptType.P2SH:
-      address = base58.encode(toBuffer([type.prefix] + hash["data"]));
-      break;
-    case ScriptType.P2WPKH:
-      address = segwit.encode(
-          Segwit(type.bech32HRP, 0, hash["data"])); // witness_v0_keyhash
-      break;
+      scriptType = ScriptType.P2WPKH;
+      pubkeyHash = toBuffer(buffer.sublist(2));
+    } else {
+      pubkeyHash = null;
+    }
+    return {'type': scriptType, 'data': pubkeyHash};
   }
 
-  return address;
+  String scriptToAddress() {
+    Map<String, dynamic> hash = this.scriptToPubkeyHash();
+    ScriptType type = hash["type"];
+    String address;
+    switch (type) {
+      case ScriptType.P2PK:
+      case ScriptType.P2PKH:
+      case ScriptType.P2SH:
+        address = base58.encode(toBuffer([type.prefix] + hash["data"]));
+        break;
+      case ScriptType.P2WPKH:
+        address = segwit.encode(
+            Segwit(type.bech32HRP, 0, hash["data"])); // witness_v0_keyhash
+        break;
+      default:
+    }
+
+    return address;
+  }
 }
 
 String pubkeyToP2wphAddress(dynamic pubkey) {

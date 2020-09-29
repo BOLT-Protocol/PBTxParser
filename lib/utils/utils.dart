@@ -134,6 +134,17 @@ BigInt decodeBigInt(List<int> bytes) {
   return result;
 }
 
+/// Decode a BigInt from bytes in little-endian encoding.
+BigInt decodeBigIntL(List<int> bytes) {
+  List<int> revertedBytes = bytes.reversed.toList();
+  BigInt result = new BigInt.from(0);
+  for (int i = 0; i < revertedBytes.length; i++) {
+    result +=
+        new BigInt.from(revertedBytes[revertedBytes.length - i - 1]) << (8 * i);
+  }
+  return result;
+}
+
 /// Encode a BigInt into bytes using big-endian encoding.
 Uint8List encodeBigInt(BigInt number) {
   var _byteMask = new BigInt.from(0xff);
