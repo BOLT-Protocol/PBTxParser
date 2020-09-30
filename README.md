@@ -29,7 +29,9 @@ flutter create <Name-Of-Project>
 ```
 
 Returning to the stable channel (or any other) requires calling flutter channel <channel> explicitly.
-
+```javascript=
+flutter channel <channel> 
+```
 referencese:
 - [Flutter for web developers](https://flutter.dev/docs/get-started/flutter-for/web-devs)
 
