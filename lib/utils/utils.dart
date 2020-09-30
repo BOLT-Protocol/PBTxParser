@@ -108,8 +108,9 @@ String fromAscii(String stringValue) {
 /// Is the string a hex string.
 bool isHexString(String value, {int length = 0}) {
   checkNotNull(value);
+  print(RegExp('^[0-9A-Fa-f]*\$').hasMatch(value));
 
-  if (!RegExp('^0x[0-9A-Fa-f]*\$').hasMatch(value) ||
+  if (!RegExp('^0x[0-9A-Fa-f]*\$').hasMatch(value) &&
       !RegExp('^[0-9A-Fa-f]*\$').hasMatch(value)) {
     return false;
   }

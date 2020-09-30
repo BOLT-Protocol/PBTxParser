@@ -72,14 +72,19 @@ class BitcoinTransaction {
 
   BitcoinTransaction();
 
-  BitcoinTransaction decodeTransaction(String hexData) {
+  static BitcoinTransaction decode(String hexData) {
+    print('model: decode');
     BitcoinTransaction transaction = BitcoinTransaction();
     Uint8List data = toBuffer(hexData);
     int pointer = 0;
 
     // version
-    int version = decodeBigIntL(data.sublist(pointer, VERSION_LENGTH)).toInt();
-    if (version != 1 || version != 2) throw ErrorDescription('wrong version');
+    int version =
+        decodeBigIntL(data.sublist(pointer, pointer + VERSION_LENGTH)).toInt();
+    print(
+        'pointer:$pointer, version:$version,  sublist: ${data.sublist(pointer, pointer + VERSION_LENGTH)}');
+    if (!(version == 1 || version == 2))
+      throw ErrorDescription('wrong version');
     transaction.version = version;
     Config().setTestnet(version == 2 ? true : false);
     pointer += VERSION_LENGTH;
@@ -89,21 +94,22 @@ class BitcoinTransaction {
     // isSewgit
     bool isSewgit = false;
     transaction.isSewgit = isSewgit;
-    if (data.sublist(pointer, pointer + 2) ==
-        [ADVANCED_TRANSACTION_MARKER, ADVANCED_TRANSACTION_FLAG]) {
+    print(
+        'pointer:$pointer, data[pointer] :${data[pointer]},  data[pointer+1] :${data[pointer + 1]},advance: ${[
+      ADVANCED_TRANSACTION_MARKER,
+      ADVANCED_TRANSACTION_FLAG
+    ]}');
+
+    if (data[pointer] == ADVANCED_TRANSACTION_MARKER &&
+        data[pointer + 1] == ADVANCED_TRANSACTION_FLAG) {
       transaction.isSewgit = true;
       pointer += 2;
-      print(
-          'pointer:$pointer, sublist:${data.sublist(pointer, pointer + 2)},  advance: ${[
-        ADVANCED_TRANSACTION_MARKER,
-        ADVANCED_TRANSACTION_FLAG
-      ]}');
     }
 
     // txins
     int txinCounts = data[pointer];
     pointer++;
-    print('pointer:$pointer, txinCounts:$txinCounts}');
+    print('pointer:$pointer, txinCounts:$txinCounts');
     for (int index = 0; index < txinCounts; index++) {
       String preTxid = hex.encode(
           data.sublist(pointer, pointer + TXID_LENGTH).reversed.toList());
@@ -160,8 +166,8 @@ class BitcoinTransaction {
     // txouts
     int txoutCounts = data[pointer];
     pointer++;
-    print('pointer:$pointer, txinCounts:$txinCounts}');
-    for (int index = 0; index < txinCounts; index++) {
+    print('pointer:$pointer, txinCounts:$txoutCounts}');
+    for (int index = 0; index < txoutCounts; index++) {
       BigInt value =
           decodeBigIntL(data.sublist(pointer, pointer + VALUE_LENGTH));
       pointer += VALUE_LENGTH;
@@ -193,7 +199,7 @@ class BitcoinTransaction {
           value: value,
           script: hex.encode(script),
           type: scriptType,
-          addresses: addresses != null ? [address] : null);
+          addresses: address != null ? [address] : null);
       transaction.addOutput(output);
     }
     if (isSewgit) {
@@ -221,7 +227,7 @@ class BitcoinTransaction {
         ];
         transaction.inputs[index].addresses = [pubkeyToP2wphAddress(pubkey)];
         transaction.inputs[index].type = ScriptType.P2WPKH;
-        print('pointer:$pointer, addresses:$addresses');
+        print('pointer:$pointer, address:${pubkeyToP2wphAddress(pubkey)}');
       }
     }
     transaction.lockTime = decodeBigIntL(data.sublist(pointer)).toInt();

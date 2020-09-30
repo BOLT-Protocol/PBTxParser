@@ -11,6 +11,7 @@ import 'cubits/delegate.dart';
 import 'themes.dart';
 import 'widgets/top_layer.dart';
 import 'cubits/notification/notification_cubit.dart';
+import 'repository/decode.repository.dart';
 
 import 'screens/home.screen.dart';
 
@@ -31,63 +32,65 @@ class PBTxParser extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return
-        // MultiProvider(
-        //   providers: [],
-        //   child:
-        MultiBlocProvider(
+    return MultiProvider(
       providers: [
-        BlocProvider<NotificationCubit>(
-          create: (BuildContext context) => NotificationCubit(),
+        Provider<DecodeRepository>(
+          create: (_) => DecodeRepository(),
         ),
       ],
-      child: GestureDetector(
-        onTap: () {
-          WidgetsBinding.instance.focusManager.primaryFocus?.unfocus();
-        },
-        child: MaterialApp(
-          builder: (context, widget) => MediaQuery(
-            data: MediaQuery.of(context).copyWith(textScaleFactor: 1),
-            child: Stack(
-              children: <Widget>[
-                widget,
-                TopLayer(),
-              ],
-            ),
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider<NotificationCubit>(
+            create: (BuildContext context) => NotificationCubit(),
           ),
-          // title: I18n.t('pocket_band'), // Can not use translation in MaterialApp before i18n loaded
-          title: 'Pocket Bank',
-          theme: pbThemeData,
-          darkTheme: pbDarkThemeData,
-          // home: HomePage(title: I18n.t('login')),
-          routes: {
-            '/': (context) => HomeScreen(),
-            HomeScreen.routeName: (context) => HomeScreen(),
+        ],
+        child: GestureDetector(
+          onTap: () {
+            WidgetsBinding.instance.focusManager.primaryFocus?.unfocus();
           },
+          child: MaterialApp(
+            builder: (context, widget) => MediaQuery(
+              data: MediaQuery.of(context).copyWith(textScaleFactor: 1),
+              child: Stack(
+                children: <Widget>[
+                  widget,
+                  TopLayer(),
+                ],
+              ),
+            ),
+            // title: I18n.t('pocket_band'), // Can not use translation in MaterialApp before i18n loaded
+            title: 'Pocket Bank',
+            theme: pbThemeData,
+            darkTheme: pbDarkThemeData,
+            // home: HomePage(title: I18n.t('login')),
+            routes: {
+              '/': (context) => HomeScreen(),
+              HomeScreen.routeName: (context) => HomeScreen(),
+            },
 
-          localizationsDelegates: [
-            const I18nDelegate(),
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate,
-          ],
-          supportedLocales: [
-            const Locale('en'),
-            const Locale('ja', 'JP'),
-          ],
-          localeListResolutionCallback: (deviceLocales, supportedLocales) {
-            Locale locale = supportedLocales.toList()[0];
-            for (Locale deviceLocale in deviceLocales) {
-              if (I18nDelegate().isSupported(deviceLocale)) {
-                locale = deviceLocale;
-                break;
+            localizationsDelegates: [
+              const I18nDelegate(),
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: [
+              const Locale('en'),
+              const Locale('ja', 'JP'),
+            ],
+            localeListResolutionCallback: (deviceLocales, supportedLocales) {
+              Locale locale = supportedLocales.toList()[0];
+              for (Locale deviceLocale in deviceLocales) {
+                if (I18nDelegate().isSupported(deviceLocale)) {
+                  locale = deviceLocale;
+                  break;
+                }
               }
-            }
-            Intl.defaultLocale = locale.languageCode;
-            return locale;
-          },
+              Intl.defaultLocale = locale.languageCode;
+              return locale;
+            },
+          ),
         ),
-        // ),
       ),
     );
   }
