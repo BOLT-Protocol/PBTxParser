@@ -24,7 +24,7 @@ const int OP_CODESEPARATOR = 0xab;
 final Base58 base58 = Base58();
 final Base58 base58Xrp = Base58.xrp();
 
-enum ScriptType { P2PK, P2PKH, P2SH, P2WPKH, NULL }
+enum ScriptType { P2PK, P2PKH, P2SH, P2WPKH, NULL, EMPTY }
 
 extension ScriptTypeExt on ScriptType {
   String get name {
@@ -43,6 +43,9 @@ extension ScriptTypeExt on ScriptType {
         break;
       case ScriptType.NULL:
         return "null-data";
+        break;
+      case ScriptType.EMPTY:
+        return "empty";
         break;
       default:
         return null;
@@ -224,12 +227,13 @@ extension ListExt<T> on List<int> {
       scriptType = ScriptType.P2WPKH;
       pubkeyHash = toBuffer(buffer.sublist(2));
     } else {
-      pubkeyHash = null;
+      pubkeyHash = buffer;
+      scriptType = ScriptType.EMPTY;
     }
     return {'type': scriptType, 'data': pubkeyHash};
   }
 
-  String scriptToAddress() {
+  Map<String, dynamic> scriptToAddress() {
     Map<String, dynamic> hash = this.scriptToPubkeyHash();
     ScriptType type = hash["type"];
     String address;
@@ -244,9 +248,10 @@ extension ListExt<T> on List<int> {
             Segwit(type.bech32HRP, 0, hash["data"])); // witness_v0_keyhash
         break;
       default:
+        address = null;
     }
 
-    return address;
+    return {'type': type, 'address': address};
   }
 }
 
