@@ -1,16 +1,38 @@
 # PBTxParser
 
-A new Flutter project.
+It is a Flutter Web Project
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+Flutter web is currently in beta stage. Thus, in order to create a Flutter app with web support, you need to be in the beta channel of Flutter.
 
-A few resources to get you started if this is your first Flutter project:
+Shift to the beta channel:
+```javascript= 
+flutter channel beta
+```
+Upgrade Flutter:
+```javascript= 
+flutter upgrade
+```
+Enable web support:
+```javascript= 
+flutter config --enable-web
+```
+open an existing project:
+cd to the project file
+```javascript= 
+flutter run -d chrome
+```
+Create a new Flutter project:
+```javascript= 
+flutter create <Name-Of-Project>
+```
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
+Returning to the stable channel (or any other) requires calling flutter channel <channel> explicitly.
 
-For help getting started with Flutter, view our
+referencese:
+- [Flutter for web developers](https://flutter.dev/docs/get-started/flutter-for/web-devs)
+
+For help getting started with Flutter, view Flutter
 [online documentation](https://flutter.dev/docs), which offers tutorials,
 samples, guidance on mobile development, and a full API reference.
