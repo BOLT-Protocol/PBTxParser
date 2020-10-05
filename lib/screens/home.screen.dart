@@ -51,7 +51,6 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget resultWidget(dynamic result, Size screenSize) {
-    print(result);
     return Container(
       margin: EdgeInsets.symmetric(horizontal: screenSize.width * 0.1),
       child: Column(
@@ -72,7 +71,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   color: Color(0xfff5f5f5),
                   border: Border.all(color: Colors.black54, width: 1),
                   borderRadius: BorderRadius.circular(8)),
-              child: Text('$result')),
+              child: SelectableText('$result')),
           SizedBox(
             height: 32,
           ),

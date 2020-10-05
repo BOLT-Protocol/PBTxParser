@@ -61,31 +61,30 @@ class Input {
             $witness
             ]""";
     }
-
     String data;
     print('WARNING: ${this.script}');
     if (this.script != null && this.witness != null)
       data = """
           {
-            $FieldName_Addresses: $addresses,
-            $FieldName_OutputIndex: ${this.vout},
-            $FieldName_OutputValue: ${this.value},
-            $FieldName_PreTxid: ${this.txid},
-            $FieldName_ScriptType: ${this.type.name},
-            $FieldName_Script: ${this.script},
-            $FieldName_Witness: $witness,
-            $FieldName_Sequence: ${this.sequence}
+              $FieldName_Addresses: $addresses,
+              $FieldName_OutputIndex: ${this.vout},
+              $FieldName_OutputValue: ${this.value},
+              $FieldName_PreTxid: ${this.txid},
+              $FieldName_ScriptType: ${this.type.name},
+              $FieldName_Script: ${this.script},
+              $FieldName_Witness: $witness,
+              $FieldName_Sequence: ${this.sequence}
           },""";
     else if (this.script != null || this.witness != null)
       data = """
           {
-            $FieldName_Addresses: $addresses,
-            $FieldName_OutputIndex: ${this.vout},
-            $FieldName_OutputValue: ${this.value},
-            $FieldName_PreTxid: ${this.txid},
-            $FieldName_ScriptType: ${this.type.name},
-            ${this.script != null ? FieldName_Script : FieldName_Witness}: ${this.script != null ? this.script : witness},
-            $FieldName_Sequence: ${this.sequence}
+              $FieldName_Addresses: $addresses,
+              $FieldName_OutputIndex: ${this.vout},
+              $FieldName_OutputValue: ${this.value},
+              $FieldName_PreTxid: ${this.txid},
+              $FieldName_ScriptType: ${this.type.name},
+              ${this.script != null ? FieldName_Script : FieldName_Witness}: ${this.script != null ? this.script : witness},
+              $FieldName_Sequence: ${this.sequence}
           },""";
     else
       data = """

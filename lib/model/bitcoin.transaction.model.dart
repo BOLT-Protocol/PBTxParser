@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:PBTxParser/model/pb.contract.model.dart';
 import 'package:PBTxParser/utils/hash.dart';
 import 'package:flutter/material.dart';
 import 'package:convert/convert.dart' show hex;
@@ -10,6 +11,7 @@ import '../utils/extensions.dart';
 
 import 'bitcoin.input.model.dart';
 import 'bitcoin.output.model.dart';
+import 'transaction.type.model.dart';
 
 const ADVANCED_TRANSACTION_MARKER = 0x00;
 const ADVANCED_TRANSACTION_FLAG = 0x01;
@@ -21,6 +23,10 @@ const VALUE_LENGTH = 8;
 const TXID_LENGTH = 32;
 
 class BitcoinTransaction {
+  static const String FieldName_Type = "type";
+  static const String FieldName_Detail = "detail";
+  static const String FieldName_Signed = "signed";
+  static const String FieldName_PocketBank = "pocket_bank";
   static const String FieldName_Addresses = "addresses";
   static const String FieldName_BlockHeight = "block_height";
   static const String FieldName_BlockIndex = "block_index";
@@ -40,6 +46,7 @@ class BitcoinTransaction {
   static const String FieldName_LockedTime = "lock_time";
 
   List<String> addresses;
+  bool signed;
   String txid; // hash
   List<Input> inputs;
   List<Output> outputs;
@@ -49,6 +56,7 @@ class BitcoinTransaction {
   int version;
   int lockTime;
   bool isSewgit;
+  PBContractData contractData;
 
   void addInput(Input input) {
     if (this.inputs == null)
@@ -118,7 +126,10 @@ class BitcoinTransaction {
           "${index == 0 ? '\n' : ''}${output.text}${index == this.outputs.length - 1 ? '' : '\n'}";
     });
 
-    String data = """{
+    String data = """
+$FieldName_Type: ${Transaction.BITCOIN.type},
+$FieldName_Signed: ${this.signed},
+$FieldName_Detail: {
       $FieldName_Addresses: [
         $addresses],
       $FieldName_Fees: ${this.fee},
@@ -133,6 +144,30 @@ class BitcoinTransaction {
       $FieldName_VoutSize: ${this.outputs.length},
       $FieldName_LockedTime: ${this.lockTime}
 }""";
+    if (this.contractData != null) {
+      data = """
+$FieldName_Type: ${Transaction.BITCOIN.type},
+$FieldName_Signed: ${this.signed},
+$FieldName_Detail: {
+      $FieldName_Addresses: [
+        $addresses],
+      $FieldName_Fees: ${this.fee},
+      $FieldName_TxId: ${this.txid},
+      $FieldName_Inputs: [$inputs
+      ],
+      $FieldName_Outputs: [$outputs
+      ],
+      $FieldName_TotalValue: ${this.total},
+      $FieldName_Version: ${this.version},
+      $FieldName_VinSize: ${this.inputs.length},
+      $FieldName_VoutSize: ${this.outputs.length},
+      $FieldName_LockedTime: ${this.lockTime}
+  }
+$FieldName_PocketBank: {
+      ${this.contractData.text}
+  }
+}""";
+    }
     return data;
   }
 
@@ -268,6 +303,14 @@ class BitcoinTransaction {
           type: address == null ? ScriptType.NULL : scriptType,
           addresses: address != null ? [address] : null,
           dataHex: address == null ? hex.encode(script.sublist(2)) : null);
+      print(
+          'WARNING PBContractData: ${address == null && value == BigInt.zero}');
+      if (address == null && value == BigInt.zero) {
+        print('WARNING RUN PBContractData');
+        transaction.contractData = PBContractData(
+            transaction.outputs.first.addresses.first,
+            toBuffer(script.sublist(2)));
+      }
       transaction.addOutput(output);
     }
     print('pointer:$pointer, isSewgit:$isSewgit');

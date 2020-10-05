@@ -56,19 +56,19 @@ class Output {
             ]""";
       data = """
           {
-            $FieldName_Addresses: $addresses,
-            $FieldName_ScriptType: ${this.type.name},
-            $FieldName_Script: ${this.script},
-            $FieldName_Value: ${this.value}
+              $FieldName_Addresses: $addresses,
+              $FieldName_ScriptType: ${this.type.name},
+              $FieldName_Script: ${this.script},
+              $FieldName_Value: ${this.value}
           },""";
     } else if (this.addresses == null)
       data = """
           {
-            $FieldName_Addresses: null,
-            $FieldName_DataHex: ${this.dataHex},
-            $FieldName_ScriptType: ${this.type.name},
-            $FieldName_Script: ${this.script},
-            $FieldName_Value: ${this.value}
+              $FieldName_Addresses: null,
+              $FieldName_DataHex: ${this.dataHex},
+              $FieldName_ScriptType: ${this.type.name},
+              $FieldName_Script: ${this.script},
+              $FieldName_Value: ${this.value}
           },""";
     return data;
   }
