@@ -1,7 +1,10 @@
 import 'dart:typed_data';
-import 'package:PBTxParser/utils/utils.dart';
 import 'package:convert/convert.dart' show hex;
 
+import 'cointype.model.dart';
+
+import '../utils/utils.dart';
+import '../utils/extensions.dart';
 import '../utils/rlp.dart' as rlp;
 
 enum PBContract { deposit, withdraw, transfer, swap, donate, unknown }
@@ -83,6 +86,8 @@ class PBContractData {
   PBContractData(String contractAddress, Uint8List data)
       : this.contractAddress = contractAddress {
     List<dynamic> result;
+    Uint8List data = toBuffer(
+        'f83884695543c384800000018810a1a596934f2e6084800000018807d1181102ace5289600145305fe9ad496300cd73a633b72d4b4620e03388a01');
     try {
       print(
           'contractAddress: $contractAddress ,data: ${hex.encode(data.last == 1 ? data.sublist(0, data.length - 1) : data)}');
@@ -117,7 +122,14 @@ class PBContractData {
           this.fromAmount = decodeBigInt(result[2]);
           this.toCoinType = hex.encode(result[3]);
           this.toAmount = decodeBigInt(result[4]);
-          this.toAddress = hex.encode(result[5]);
+          if (decodeBigInt(result[3]).toInt() ==
+              0x80000001) //CoinType.bitcoin.value)
+            this.toAddress =
+                (result[5] as List<int>).scriptToAddress()["address"];
+          else if (decodeBigInt(result[3]).toInt() ==
+              0x8000003C) //CoinType.ethereum.value)
+            this.toAddress = "0x${hex.encode(result[5])}";
+          // TODO Ripple
           break;
         case PBContract.donate:
           break;

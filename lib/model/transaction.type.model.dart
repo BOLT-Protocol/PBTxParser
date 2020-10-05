@@ -1,15 +1,15 @@
-enum Transaction { RIPPLE, BITCOIN, ETHEREUM }
+enum Transaction { ripple, bitcoin, ethereum }
 
 extension TransactionExt on Transaction {
   String get type {
     switch (this) {
-      case Transaction.RIPPLE:
+      case Transaction.ripple:
         return "Ripple";
         break;
-      case Transaction.BITCOIN:
+      case Transaction.bitcoin:
         return "Bitcoin";
         break;
-      case Transaction.ETHEREUM:
+      case Transaction.ethereum:
         return "Ethereum";
         break;
       default:

@@ -127,7 +127,7 @@ class BitcoinTransaction {
     });
 
     String data = """
-$FieldName_Type: ${Transaction.BITCOIN.type},
+$FieldName_Type: ${Transaction.bitcoin.type},
 $FieldName_Signed: ${this.signed},
 $FieldName_Detail: {
       $FieldName_Addresses: [
@@ -146,7 +146,7 @@ $FieldName_Detail: {
 }""";
     if (this.contractData != null) {
       data = """
-$FieldName_Type: ${Transaction.BITCOIN.type},
+$FieldName_Type: ${Transaction.bitcoin.type},
 $FieldName_Signed: ${this.signed},
 $FieldName_Detail: {
       $FieldName_Addresses: [
