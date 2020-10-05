@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:PBTxParser/utils/hash.dart';
 import 'package:flutter/material.dart';
 import 'package:convert/convert.dart' show hex;
 import '../constant/config.dart';
@@ -271,6 +272,12 @@ class BitcoinTransaction {
     }
     print('pointer:$pointer, isSewgit:$isSewgit');
     if (isSewgit) {
+      List<int> buffer = [
+        ...data.sublist(0, VERSION_LENGTH),
+        ...data.sublist(VERSION_LENGTH + 2, pointer),
+        ...data.sublist(data.length - LOCKTIME_LENGTH)
+      ];
+      transaction.txid = hex.encode(doubleSHA256(toBuffer(buffer)));
       for (int index = 0; index < txinCounts; index++) {
         int starter = data[pointer];
         print('pointer:$pointer, starter:$starter');
@@ -300,8 +307,11 @@ class BitcoinTransaction {
         transaction.inputs[index].type = ScriptType.P2WPKH;
         print('pointer:$pointer, address:${pubkeyToP2wphAddress(pubkey)}');
       }
+    } else {
+      transaction.txid = hex.encode(doubleSHA256(data));
     }
-    transaction.lockTime = decodeBigIntL(data.sublist(pointer)).toInt();
+    transaction.lockTime =
+        decodeBigIntL(data.sublist(data.length - LOCKTIME_LENGTH)).toInt();
     print(
         'pointer:$pointer, dataLength: ${data.length}, lockTime:${transaction.lockTime}');
     return transaction;
