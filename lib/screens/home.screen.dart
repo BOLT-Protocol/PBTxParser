@@ -50,8 +50,44 @@ class _HomeScreenState extends State<HomeScreen> {
     super.didChangeDependencies();
   }
 
-  Widget resultWidget(dynamic result) {
-    return Container(child: Text('result'));
+  Widget resultWidget(dynamic result, Size screenSize) {
+    print(result);
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: screenSize.width * 0.1),
+      child: Column(
+        children: [
+          Container(
+            padding: EdgeInsets.symmetric(vertical: 16),
+            alignment: Alignment.centerLeft,
+            child: Text(
+              t('decode_tx'),
+              style:
+                  Theme.of(context).textTheme.headline3.copyWith(fontSize: 24),
+            ),
+          ),
+          Container(
+              width: double.infinity,
+              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+              decoration: BoxDecoration(
+                  color: Color(0xfff5f5f5),
+                  border: Border.all(color: Colors.black54, width: 1),
+                  borderRadius: BorderRadius.circular(8)),
+              child: Text('$result')),
+          SizedBox(
+            height: 32,
+          ),
+          Container(
+            padding: EdgeInsets.symmetric(vertical: 16),
+            alignment: Alignment.centerLeft,
+            child: Text(
+              '\t${t('input_new_tx_hex')}',
+              style:
+                  Theme.of(context).textTheme.headline3.copyWith(fontSize: 24),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -66,86 +102,87 @@ class _HomeScreenState extends State<HomeScreen> {
               screenSize: screenSize,
               scrollPosition: _scrollPosition,
             ),
-            BlocListener<DecodeTransactionCubit, DecodeTransactionState>(
-              listener: (context, state) {
-                print('state: $state');
-                if (state is Decoded) _widget = resultWidget(state.decodedTx);
-                if (state is DecodeTransactionInitial) _widget = Container();
-              },
-              cubit: _decodeCubit,
-              child: Expanded(
-                child: SingleChildScrollView(
-                  controller: _scrollController,
-                  child: Column(
-                    children: [
-                      Bar(
-                        title: t('decode_a_tx'),
-                        screenHeight: screenSize.height,
-                        screenWidth: screenSize.width,
-                      ),
-                      _widget,
-                      Container(
-                        width: double.infinity,
-                        padding: EdgeInsets.symmetric(
-                            horizontal: screenSize.width * 0.1),
-                        child: Column(
-                          children: [
-                            SizedBox(
-                              height: 32,
-                            ),
-                            Container(
-                              padding: EdgeInsets.symmetric(vertical: 8),
-                              width: double.infinity,
-                              child: Text(
-                                t('tx_hex'),
-                                textAlign: TextAlign.start,
-                              ),
-                            ),
-                            SizedBox(
-                              height: 16,
-                            ),
-                            Container(
-                              child: TextField(
-                                decoration: InputDecoration(
-                                    border: OutlineInputBorder(
-                                        borderSide: BorderSide(
-                                  width: 1,
-                                ))),
-                                controller: _txHexCtrl,
-                                minLines: screenSize.height ~/ 50,
-                                maxLines: 1000,
-                              ),
-                            ),
-                            Container(
-                              margin: EdgeInsets.symmetric(vertical: 50),
-                              child: RaisedButton(
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(5)),
-                                elevation: 0.0,
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: 32, vertical: 16),
-                                onPressed: () {
-                                  print('${_txHexCtrl.text}');
-                                  _decodeCubit.decode(_txHexCtrl.text);
-                                },
-                                color: Theme.of(context).primaryColor,
-                                child: Text(
-                                  t('decode_tx'),
-                                  style: Theme.of(context).textTheme.bodyText1,
+            BlocBuilder<DecodeTransactionCubit, DecodeTransactionState>(
+                cubit: _decodeCubit,
+                builder: (context, state) {
+                  print('state: $state');
+                  if (state is Decoded)
+                    _widget = resultWidget(state.decodedTx, screenSize);
+                  if (state is DecodeTransactionInitial) _widget = Container();
+                  return Expanded(
+                    child: SingleChildScrollView(
+                      controller: _scrollController,
+                      child: Column(
+                        children: [
+                          Bar(
+                            title: t('decode_a_tx'),
+                            screenHeight: screenSize.height,
+                            screenWidth: screenSize.width,
+                          ),
+                          SizedBox(
+                            height: 32,
+                          ),
+                          _widget,
+                          Container(
+                            width: double.infinity,
+                            padding: EdgeInsets.symmetric(
+                                horizontal: screenSize.width * 0.1),
+                            child: Column(
+                              children: [
+                                Container(
+                                  padding: EdgeInsets.symmetric(vertical: 8),
+                                  width: double.infinity,
+                                  child: Text(
+                                    t('tx_hex'),
+                                    textAlign: TextAlign.start,
+                                  ),
                                 ),
-                              ),
+                                SizedBox(
+                                  height: 16,
+                                ),
+                                Container(
+                                  child: TextField(
+                                    decoration: InputDecoration(
+                                        border: OutlineInputBorder(
+                                            borderSide: BorderSide(
+                                      width: 1,
+                                    ))),
+                                    controller: _txHexCtrl,
+                                    minLines: screenSize.height ~/ 50,
+                                    maxLines: 1000,
+                                  ),
+                                ),
+                                Container(
+                                  margin: EdgeInsets.symmetric(vertical: 50),
+                                  child: RaisedButton(
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(5)),
+                                    elevation: 0.0,
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: 32, vertical: 16),
+                                    onPressed: () {
+                                      print('${_txHexCtrl.text}');
+                                      _decodeCubit.decode(_txHexCtrl.text);
+                                    },
+                                    color: Theme.of(context).primaryColor,
+                                    child: Text(
+                                      t('decode_tx'),
+                                      style:
+                                          Theme.of(context).textTheme.bodyText1,
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
+                          ),
+                          Footer(
+                            screenSize: screenSize,
+                          ),
+                        ],
                       ),
-                      Footer(
-                        screenSize: screenSize,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
+                    ),
+                  );
+                }),
           ],
         ),
       ),

@@ -8,7 +8,7 @@ abstract class DecodeTransactionState extends Equatable {
 }
 
 class Decoded extends DecodeTransactionState {
-  final Map decodedTx;
+  final dynamic decodedTx;
 
   Decoded(this.decodedTx);
   @override

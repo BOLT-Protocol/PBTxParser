@@ -14,7 +14,7 @@ class DecodeTransactionCubit extends Cubit<DecodeTransactionState> {
     print('cubit: decode');
     BitcoinTransaction bitcoinTransaction =
         _decodeRepository.decodeBtcTransaction(hexData);
-    emit(Decoded({}));
+    emit(Decoded(bitcoinTransaction.text));
   }
 
   @override

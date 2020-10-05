@@ -5,8 +5,10 @@ import 'package:convert/convert.dart' show hex;
 import '../constant/config.dart';
 
 import '../utils/utils.dart';
-
 import '../utils/extensions.dart';
+
+import 'bitcoin.input.model.dart';
+import 'bitcoin.output.model.dart';
 
 const ADVANCED_TRANSACTION_MARKER = 0x00;
 const ADVANCED_TRANSACTION_FLAG = 0x01;
@@ -28,16 +30,7 @@ class BitcoinTransaction {
   static const String FieldName_TxId = "txid";
   static const String FieldName_TxHash = "txhash";
   static const String FieldName_Inputs = "inputs";
-  static const String FieldName_Age = "age";
-  static const String FieldName_OutputIndex = "output_index";
-  static const String FieldName_OutputValue = "output_value";
-  static const String FieldName_PreTxid = "prev_txid";
-  static const String FieldName_ScriptType = "script_type";
-  static const String FieldName_Sequence = "sequence";
-  static const String FieldName_Script = "script";
-  static const String FieldName_Witness = "witness";
   static const String FieldName_Outputs = "outputs";
-  static const String FieldName_Value = "value";
   static const String FieldName_Size = "size";
   static const String FieldName_TotalValue = "total";
   static const String FieldName_Version = "ver";
@@ -72,11 +65,82 @@ class BitcoinTransaction {
 
   BitcoinTransaction();
 
+  Map<String, dynamic> get map {
+    this.addresses = [];
+    for (Input input in this.inputs) {
+      if (input.addresses != null) this.addresses.addAll(input.addresses);
+    }
+    for (Output output in this.outputs) {
+      if (output.addresses != null) this.addresses.addAll(output.addresses);
+    }
+    Map<String, dynamic> data = {
+      FieldName_Addresses: this.addresses,
+      FieldName_Fees: this.fee,
+      FieldName_TxId: this.txid,
+      FieldName_Inputs: [
+        for (Input input in this.inputs) {input.map}
+      ],
+      FieldName_Outputs: [
+        for (Output output in this.outputs) {output.map}
+      ],
+      FieldName_TotalValue: this.total,
+      FieldName_Version: this.version,
+      FieldName_VinSize: this.inputs.length,
+      FieldName_VoutSize: this.outputs.length,
+      FieldName_LockedTime: this.lockTime
+    };
+    return data;
+  }
+
+  String get text {
+    this.addresses = [];
+    for (Input input in this.inputs) {
+      if (input.addresses != null) this.addresses.addAll(input.addresses);
+    }
+    for (Output output in this.outputs) {
+      if (output.addresses != null) this.addresses.addAll(output.addresses);
+    }
+    String addresses = "";
+    this.addresses.asMap().forEach((index, address) {
+      addresses += """
+          $address${index != this.addresses.length - 1 ? "," : ""}
+        """;
+    });
+    String inputs = "";
+    this.inputs.asMap().forEach((index, input) {
+      inputs +=
+          "${index == 0 ? '\n' : ''}${input.text}${index == this.inputs.length - 1 ? '' : '\n'}";
+    });
+    String outputs = "";
+    this.outputs.asMap().forEach((index, output) {
+      outputs +=
+          "${index == 0 ? '\n' : ''}${output.text}${index == this.outputs.length - 1 ? '' : '\n'}";
+    });
+
+    String data = """{
+      $FieldName_Addresses: [
+        $addresses],
+      $FieldName_Fees: ${this.fee},
+      $FieldName_TxId: ${this.txid},
+      $FieldName_Inputs: [$inputs
+      ],
+      $FieldName_Outputs: [$outputs
+      ],
+      $FieldName_TotalValue: ${this.total},
+      $FieldName_Version: ${this.version},
+      $FieldName_VinSize: ${this.inputs.length},
+      $FieldName_VoutSize: ${this.outputs.length},
+      $FieldName_LockedTime: ${this.lockTime}
+}""";
+    return data;
+  }
+
   static BitcoinTransaction decode(String hexData) {
     print('model: decode');
     BitcoinTransaction transaction = BitcoinTransaction();
     Uint8List data = toBuffer(hexData);
     int pointer = 0;
+    print('pointer:$pointer, dataLength: ${data.length}');
 
     // version
     int version =
@@ -102,7 +166,8 @@ class BitcoinTransaction {
 
     if (data[pointer] == ADVANCED_TRANSACTION_MARKER &&
         data[pointer + 1] == ADVANCED_TRANSACTION_FLAG) {
-      transaction.isSewgit = true;
+      isSewgit = true;
+      transaction.isSewgit = isSewgit;
       pointer += 2;
     }
 
@@ -156,7 +221,8 @@ class BitcoinTransaction {
       Input input = Input(
         txid: preTxid,
         vout: vout,
-        script: hex.encode(script),
+        script:
+            script.length == 1 && script.first == 0 ? null : hex.encode(script),
         sequence: sequence,
         addresses: address != null ? [address] : null,
         type: scriptType,
@@ -171,7 +237,7 @@ class BitcoinTransaction {
       BigInt value =
           decodeBigIntL(data.sublist(pointer, pointer + VALUE_LENGTH));
       pointer += VALUE_LENGTH;
-      print('pointer:$pointer, preTxid:$value');
+      print('pointer:$pointer, value:$value');
       // script
       int scriptLength = data[pointer];
       List<int> script;
@@ -198,15 +264,20 @@ class BitcoinTransaction {
       Output output = Output(
           value: value,
           script: hex.encode(script),
-          type: scriptType,
-          addresses: address != null ? [address] : null);
+          type: address == null ? ScriptType.NULL : scriptType,
+          addresses: address != null ? [address] : null,
+          dataHex: address == null ? hex.encode(script.sublist(2)) : null);
       transaction.addOutput(output);
     }
+    print('pointer:$pointer, isSewgit:$isSewgit');
     if (isSewgit) {
       for (int index = 0; index < txinCounts; index++) {
         int starter = data[pointer];
         print('pointer:$pointer, starter:$starter');
-        if (starter == 0 || starter != 2) continue;
+        if (starter == 0 || starter != 2) {
+          pointer++;
+          continue;
+        }
         pointer++;
         print('pointer:$pointer, starter:$starter');
         int witnessLength = data[pointer];
@@ -231,58 +302,8 @@ class BitcoinTransaction {
       }
     }
     transaction.lockTime = decodeBigIntL(data.sublist(pointer)).toInt();
+    print(
+        'pointer:$pointer, dataLength: ${data.length}, lockTime:${transaction.lockTime}');
     return transaction;
   }
-}
-
-class Input {
-  List<String> addresses;
-  int vout; // output_index
-  BigInt value; // output_value
-  String txid; // pre_hash
-  ScriptType type;
-  int sequence;
-  String script;
-  List<String> witness;
-  String pubkey;
-
-  Input({
-    List<String> addresses,
-    int vout,
-    BigInt value,
-    String txid,
-    ScriptType type,
-    int sequence,
-    String script,
-    List<String> witness,
-    String pubkey,
-  })  : addresses = addresses,
-        vout = vout,
-        value = value,
-        txid = txid,
-        type = type,
-        sequence = sequence,
-        script = script,
-        witness = witness,
-        pubkey = pubkey;
-}
-
-class Output {
-  List<String> addresses;
-  String script;
-  ScriptType type;
-  BigInt value;
-  String dataHex;
-
-  Output({
-    List<String> addresses,
-    String script,
-    ScriptType type,
-    BigInt value,
-    String dataHex,
-  })  : addresses = addresses,
-        script = script,
-        type = type,
-        value = value,
-        dataHex = dataHex;
 }
