@@ -13,7 +13,7 @@ class DecodeTransactionCubit extends Cubit<DecodeTransactionState> {
   Future<void> decode(String hexData) async {
     print('cubit: decode');
     List<String> decodedData =
-        await _decodeRepository.decodeBtcTransaction(hexData);
+        await _decodeRepository.decodeTransaction(hexData);
     decodedData.removeWhere((element) => element == null);
     emit(Decoded(decodedData));
   }

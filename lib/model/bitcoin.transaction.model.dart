@@ -63,7 +63,7 @@ class BitcoinTransaction {
   int lockTime;
   bool isSewgit;
   PBContractData contractData;
-  String _type = Transaction.bitcoin.type;
+  String _type = TransactionType.bitcoin.type;
   bool _signed;
   List<String> _signedPubkey;
 

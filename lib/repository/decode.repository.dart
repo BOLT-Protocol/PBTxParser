@@ -1,20 +1,10 @@
-import '../model/bitcoin.transaction.model.dart';
-import '../model/transaction.type.model.dart';
+import '../model/decode.transaction.model.dart';
 
 class DecodeRepository {
-  Future<List<String>> decodeBtcTransaction(String hexData) async {
+  Future<List<String>> decodeTransaction(String hexData) async {
     print('repository: decode');
-    BitcoinTransaction bitcoinTransaction =
-        await BitcoinTransaction.decode(hexData);
+    List<String> decodedResult = await DecodeTransaction.decode(hexData);
 
-    return bitcoinTransaction == null
-        ? [Transaction.unknown.type]
-        : [
-            bitcoinTransaction.type,
-            bitcoinTransaction.signed.toString(),
-            bitcoinTransaction.signedPubkey,
-            bitcoinTransaction.detail,
-            bitcoinTransaction.pbData
-          ];
+    return decodedResult;
   }
 }
