@@ -94,8 +94,17 @@ class BitcoinTransaction {
     return "Signed: $_signed";
   }
 
-  String get signedPubkey =>
-      this._signedPubkey != null ? "Signed Pubkic Key: $_signedPubkey" : null;
+  String get signedPubkey {
+    List<String> _signedPubkey = [];
+    bool signed = true;
+    this.inputs.forEach((input) {
+      if (input.signed == null || !input.signed)
+        signed = false;
+      else
+        _signedPubkey.add(input.pubkey);
+    });
+    return signed ? "Signed Pubkic Key: $_signedPubkey" : null;
+  }
 
   Uint8List get versionInBuffer => Uint8List(4)
     ..buffer.asByteData().setUint32(0, this.version, Endian.little);
@@ -428,6 +437,7 @@ $FieldName_Detail: {
       List<int> script;
       String address;
       ScriptType scriptType;
+      bool signed;
       pointer++;
       print('pointer:$pointer, scriptLength:$scriptLength');
       try {
@@ -457,7 +467,16 @@ $FieldName_Detail: {
         Map<String, dynamic> result = script.sublist(1).decodeScript();
         address = result["address"];
         scriptType = result["type"];
-        if (scriptType != ScriptType.P2PKH) {}
+        if (scriptType == ScriptType.EMPTY) {
+          try {
+            decodeDER(toBuffer(script));
+            signed = true;
+            print('signed:$signed');
+          } catch (e) {
+            signed = false;
+            print('signed:$signed');
+          }
+        }
         print('pointer:$pointer, address:$address, scriptType:$scriptType');
       }
 
@@ -477,6 +496,7 @@ $FieldName_Detail: {
       Input input = Input(
         txid: preTxid,
         vout: vout,
+        signed: signed,
         script:
             script.length == 1 && script.first == 0 ? null : hex.encode(script),
         sequence: sequence,
@@ -660,6 +680,7 @@ $FieldName_Detail: {
       //     Decimal.parse(result["txouts"][input.vout]["amount"]));
 
       print('input.pubkey: ${input.pubkey}');
+      transaction._signedPubkey = [];
       if (input.pubkey != null) {
         List<int> buffer;
         Uint8List signature;
@@ -688,8 +709,10 @@ $FieldName_Detail: {
 
         try {
           signature = decodeDER(buffer);
+          input.signed = true;
         } catch (e) {
           print(e);
+          input.signed = false;
           return null;
         }
 

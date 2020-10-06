@@ -27,18 +27,19 @@ class Input {
   HashType hashType;
   bool signed;
 
-  Input({
-    List<String> addresses,
-    int vout,
-    BigInt value,
-    String txid,
-    ScriptType type,
-    int sequence,
-    String script,
-    List<String> witness,
-    String pubkey,
-    HashType hashType,
-  })  : addresses = addresses,
+  Input(
+      {List<String> addresses,
+      int vout,
+      BigInt value,
+      String txid,
+      ScriptType type,
+      int sequence,
+      String script,
+      List<String> witness,
+      String pubkey,
+      HashType hashType,
+      bool signed})
+      : addresses = addresses,
         vout = vout,
         value = value,
         txid = txid,
@@ -47,7 +48,8 @@ class Input {
         script = script,
         witness = witness,
         pubkey = pubkey,
-        hashType = hashType;
+        hashType = hashType,
+        signed = signed;
 
   Uint8List get reservedTxid =>
       Uint8List.fromList(hex.decode(this.txid).reversed.toList());
