@@ -164,23 +164,24 @@ extension Uint8ListExt on Uint8List {
   }
 
   bool isP2wpkhScript() {
-    // print('isP2wpkhScript$this');
-    // print('isP2wpkhScript${this.length}');
-    // print('isP2wpkhScript${0x16}');
-    // print('isP2wpkhScript${this.length != 0x16}');
+    print('isP2wpkhScript$this');
+    print('isP2wpkhScript${this.length}');
+    print('isP2wpkhScript${0x16}');
+    print('isP2wpkhScript${this.length != 0x16}');
+    print('isP2wpkhScript${this.length != 0x16}');
 
-    if (this.length != 0x17)
+    if (this.length != 0x16)
       return false;
-    else if (this[1] != OP_0)
+    else if (this.first != OP_0)
       return false;
     else
       return true;
   }
 
   bool isP2shScript() {
-    if (this.length != 0x17)
+    if (this.length != 0x16)
       return false;
-    else if (this[1] != OP_HASH160)
+    else if (this.first != OP_HASH160)
       return false;
     else
       return true;
@@ -248,7 +249,7 @@ extension ListExt<T> on List<int> {
     scriptSig: <sig> <20-byte-hash-value>
     */
       scriptType = ScriptType.P2SH;
-      pubkeyHash = toBuffer(buffer.sublist(3, buffer.length - 1));
+      pubkeyHash = toBuffer(buffer.sublist(2, buffer.length - 1));
     } else if (buffer.isP2wpkhScript()) {
       /**
     pay-to-witness-pubkey-hash
@@ -258,7 +259,7 @@ extension ListExt<T> on List<int> {
                   (0x0014{20-byte-key-hash})
     */
       scriptType = ScriptType.P2WPKH;
-      pubkeyHash = toBuffer(buffer.sublist(3));
+      pubkeyHash = toBuffer(buffer.sublist(2));
     } else {
       pubkeyHash = buffer;
       scriptType = ScriptType.EMPTY;

@@ -454,9 +454,10 @@ $FieldName_Detail: {
         return null;
       }
       if (scriptLength > 0) {
-        Map<String, dynamic> result = script.decodeScript();
+        Map<String, dynamic> result = script.sublist(1).decodeScript();
         address = result["address"];
         scriptType = result["type"];
+        if (scriptType != ScriptType.P2PKH) {}
         print('pointer:$pointer, address:$address, scriptType:$scriptType');
       }
 
@@ -540,15 +541,19 @@ $FieldName_Detail: {
           type: address == null ? ScriptType.NULL : scriptType,
           addresses: address != null ? [address] : null,
           dataHex: address == null ? hex.encode(script.sublist(2)) : null);
+      transaction.addOutput(output);
       print(
           'WARNING PBContractData: ${address == null && value == BigInt.zero}');
       if (address == null && value == BigInt.zero) {
         print('WARNING RUN PBContractData');
+        print('${transaction.outputs}');
+        print('${transaction.outputs.first}');
+        print('${transaction.outputs.first.addresses}');
+        print('${transaction.outputs.first.addresses.first}');
         transaction.contractData = PBContractData(
             transaction.outputs.first.addresses.first,
             toBuffer(script.sublist(2)));
       }
-      transaction.addOutput(output);
     }
     print('pointer:$pointer, isSewgit:$isSewgit');
     if (isSewgit) {
