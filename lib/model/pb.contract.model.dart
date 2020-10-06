@@ -129,8 +129,7 @@ class PBContractData {
               decodeBigInt(result[3]).toInt() ==
                   0x80000000) //CoinType.bitcoin.value)
           {
-            this.toAddress =
-                (result[5] as List<int>).scriptToAddress()["address"];
+            this.toAddress = (result[5] as List<int>).decodeScript()["address"];
             if (this.toAddress == null)
               this.toAddress = "0x${hex.encode(result[5])}";
           } else if (decodeBigInt(result[3]).toInt() ==

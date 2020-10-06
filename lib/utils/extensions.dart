@@ -164,18 +164,23 @@ extension Uint8ListExt on Uint8List {
   }
 
   bool isP2wpkhScript() {
-    if (this.length != 0x16)
+    // print('isP2wpkhScript$this');
+    // print('isP2wpkhScript${this.length}');
+    // print('isP2wpkhScript${0x16}');
+    // print('isP2wpkhScript${this.length != 0x16}');
+
+    if (this.length != 0x17)
       return false;
-    else if (this.first != OP_0)
+    else if (this[1] != OP_0)
       return false;
     else
       return true;
   }
 
   bool isP2shScript() {
-    if (this.length != 0x16)
+    if (this.length != 0x17)
       return false;
-    else if (this.first != OP_HASH160)
+    else if (this[1] != OP_HASH160)
       return false;
     else
       return true;
@@ -239,11 +244,11 @@ extension ListExt<T> on List<int> {
       /**
     pay-to-script-hash
     scriptPubKey: OP_HASH160 <20-byte-hash-value> OP_EQUAL
+                  (0xa914{20-byte-script-hash}87) 
     scriptSig: <sig> <20-byte-hash-value>
-               (0xa914{20-byte-script-hash}87)
     */
       scriptType = ScriptType.P2SH;
-      pubkeyHash = toBuffer(buffer.sublist(2, buffer.length - 1));
+      pubkeyHash = toBuffer(buffer.sublist(3, buffer.length - 1));
     } else if (buffer.isP2wpkhScript()) {
       /**
     pay-to-witness-pubkey-hash
@@ -253,7 +258,7 @@ extension ListExt<T> on List<int> {
                   (0x0014{20-byte-key-hash})
     */
       scriptType = ScriptType.P2WPKH;
-      pubkeyHash = toBuffer(buffer.sublist(2));
+      pubkeyHash = toBuffer(buffer.sublist(3));
     } else {
       pubkeyHash = buffer;
       scriptType = ScriptType.EMPTY;
@@ -261,7 +266,7 @@ extension ListExt<T> on List<int> {
     return {'type': scriptType, 'data': pubkeyHash};
   }
 
-  Map<String, dynamic> scriptToAddress() {
+  Map<String, dynamic> decodeScript() {
     Map<String, dynamic> hash = this.scriptToPubkeyHash();
     ScriptType type = hash["type"];
     String address;
@@ -274,6 +279,10 @@ extension ListExt<T> on List<int> {
       case ScriptType.P2WPKH:
         address = segwit.encode(
             Segwit(type.bech32HRP, 0, hash["data"])); // witness_v0_keyhash
+        break;
+      case ScriptType.EMPTY:
+        // TODO
+
         break;
       default:
         address = null;

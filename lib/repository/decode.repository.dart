@@ -12,6 +12,7 @@ class DecodeRepository {
         : [
             bitcoinTransaction.type,
             bitcoinTransaction.signed.toString(),
+            bitcoinTransaction.signedPubkey,
             bitcoinTransaction.detail,
             bitcoinTransaction.pbData
           ];

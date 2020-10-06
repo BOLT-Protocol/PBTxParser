@@ -426,6 +426,8 @@ $FieldName_Detail: {
         return null;
       }
       List<int> script;
+      String address;
+      ScriptType scriptType;
       pointer++;
       print('pointer:$pointer, scriptLength:$scriptLength');
       try {
@@ -451,9 +453,12 @@ $FieldName_Detail: {
         print(e);
         return null;
       }
-      String address = script.scriptToAddress()["address"];
-      ScriptType scriptType = script.scriptToAddress()["type"];
-      print('pointer:$pointer, address:$address, scriptType:$scriptType');
+      if (scriptLength > 0) {
+        Map<String, dynamic> result = script.decodeScript();
+        address = result["address"];
+        scriptType = result["type"];
+        print('pointer:$pointer, address:$address, scriptType:$scriptType');
+      }
 
       // sequence is also little-Endian
       int sequence;
@@ -484,7 +489,7 @@ $FieldName_Detail: {
     try {
       txoutCounts = data[pointer];
       pointer++;
-      print('pointer:$pointer, txinCounts:$txoutCounts}');
+      print('pointer:$pointer, txoutCounts:$txoutCounts');
     } catch (e) {
       print(e);
       return null;
@@ -526,8 +531,8 @@ $FieldName_Detail: {
         print(e);
         return null;
       }
-      String address = script.scriptToAddress()["address"];
-      ScriptType scriptType = script.scriptToAddress()["type"];
+      String address = script.decodeScript()["address"];
+      ScriptType scriptType = script.decodeScript()["type"];
       print('pointer:$pointer, address:$address, scriptType:$scriptType');
       Output output = Output(
           value: value,
