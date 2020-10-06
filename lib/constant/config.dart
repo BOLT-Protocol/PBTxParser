@@ -13,3 +13,8 @@ class Config {
   Config._internal() : _isTestnet = true;
   void setTestnet(bool v) => _instance._isTestnet = v;
 }
+
+extension ConfigPrivate on Config {
+  String get cryptoApiKeyForBTC =>
+      "536b8df69a6ccc6af1a61a8bf0cacf1d4b156cf2"; //"d97ecaf316ea6175260fca6a96fa6b83a7ac68da";
+}

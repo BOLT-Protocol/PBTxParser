@@ -180,6 +180,34 @@ extension Uint8ListExt on Uint8List {
     else
       return true;
   }
+
+  List<int> toP2pkhScript() {
+    // Pubkey Hash to P2PKH Script
+    List<int> data = [];
+    data.add(OP_DUP); //0x76;
+    data.add(OP_HASH160); // 0xa9;
+    data.add(this.length);
+    data.addAll(this);
+    data.add(OP_EQUALVERIFY); //0x88;
+    data.add(OP_CHECKSIG); // 0xac；
+    return data;
+  }
+
+  List<int> pubkeyToP2PKScript() {
+    List<int> publicKey = this.length > 33 ? compressedPubKey(this) : this;
+    List<int> data = [];
+    data.add(publicKey.length);
+    data.addAll(publicKey);
+    data.add(OP_CHECKSIG);
+    return data;
+  }
+
+  List<int> toBIP49RedeemScript() {
+    // Pubkey Hash to BIP49 Redeem Script
+    List<int> rs = [0x00, 0x14];
+    rs.addAll(this);
+    return rs;
+  }
 }
 
 extension ListExt<T> on List<int> {

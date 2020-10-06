@@ -1,9 +1,19 @@
-import 'package:PBTxParser/model/bitcoin.transaction.model.dart';
+import '../model/bitcoin.transaction.model.dart';
+import '../model/transaction.type.model.dart';
 
 class DecodeRepository {
-  BitcoinTransaction decodeBtcTransaction(String hexData) {
+  Future<List<String>> decodeBtcTransaction(String hexData) async {
     print('repository: decode');
-    BitcoinTransaction btcTx = BitcoinTransaction.decode(hexData);
-    return btcTx;
+    BitcoinTransaction bitcoinTransaction =
+        await BitcoinTransaction.decode(hexData);
+
+    return bitcoinTransaction == null
+        ? [Transaction.unknown.type]
+        : [
+            bitcoinTransaction.type,
+            bitcoinTransaction.signed.toString(),
+            bitcoinTransaction.detail,
+            bitcoinTransaction.pbData
+          ];
   }
 }

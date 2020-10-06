@@ -116,6 +116,7 @@ class PBContractData {
         case PBContract.transfer:
           this.coinType = hex.encode(result[1]);
           this.amount = decodeBigInt(result[2]);
+          // TODO ADDRESS
           this.address = hex.encode(result[3]);
           break;
         case PBContract.swap:

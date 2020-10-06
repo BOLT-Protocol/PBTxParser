@@ -1,4 +1,4 @@
-enum Transaction { ripple, bitcoin, ethereum }
+enum Transaction { ripple, bitcoin, ethereum, unknown }
 
 extension TransactionExt on Transaction {
   String get type {

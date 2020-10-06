@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import '../utils/extensions.dart';
 
 class Output {
@@ -12,6 +14,9 @@ class Output {
   ScriptType type;
   BigInt value;
   String dataHex;
+
+  Uint8List get valueInBuffer => Uint8List(8)
+    ..buffer.asByteData().setUint64(0, this.value.toInt(), Endian.little);
 
   Output({
     List<String> addresses,

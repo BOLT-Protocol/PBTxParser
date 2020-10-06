@@ -182,3 +182,35 @@ Uint8List toBuffer(dynamic data) {
 
   throw TypeError();
 }
+
+Uint8List decodeDER(Uint8List buffer) {
+  // Uint8List buffer = toBuffer(der);
+  Uint8List signature;
+  List<int> r;
+  List<int> s;
+  int index = buffer.indexWhere((element) => element == 0x30);
+  print('index: $index');
+  index++;
+  int totalLength = buffer[index];
+  index++;
+  print('totalLength: $totalLength');
+  if (totalLength == buffer.sublist(index, buffer.length - 1).length) {
+    index++;
+    int rL = buffer[index];
+    index++;
+    print('rL: $rL');
+    r = buffer.sublist(index, index + rL);
+    index += rL;
+    print('r[${hex.encode(r)}]: $r');
+    index++;
+    int sL = buffer[index];
+    print('sL: $sL');
+    index++;
+    s = buffer.sublist(index, index + sL);
+    print('s[${hex.encode(s)}]: $s');
+    signature = toBuffer(r + s);
+  } else {
+    return null;
+  }
+  return signature;
+}

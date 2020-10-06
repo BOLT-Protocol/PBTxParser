@@ -1,4 +1,9 @@
+import 'dart:typed_data';
+
+import 'package:decimal/decimal.dart';
+
 import '../utils/extensions.dart';
+import 'package:convert/convert.dart' show hex;
 
 class Input {
   static const String FieldName_Addresses = "addresses";
@@ -19,6 +24,8 @@ class Input {
   String script;
   List<String> witness;
   String pubkey;
+  HashType hashType;
+  bool signed;
 
   Input({
     List<String> addresses,
@@ -30,6 +37,7 @@ class Input {
     String script,
     List<String> witness,
     String pubkey,
+    HashType hashType,
   })  : addresses = addresses,
         vout = vout,
         value = value,
@@ -38,7 +46,19 @@ class Input {
         sequence = sequence,
         script = script,
         witness = witness,
-        pubkey = pubkey;
+        pubkey = pubkey,
+        hashType = hashType;
+
+  Uint8List get reservedTxid =>
+      Uint8List.fromList(hex.decode(this.txid).reversed.toList());
+  Uint8List get voutInBuffer =>
+      Uint8List(4)..buffer.asByteData().setUint32(0, this.vout, Endian.little);
+  Uint8List get sequenceInBuffer => Uint8List(4)
+    ..buffer.asByteData().setUint32(0, this.sequence, Endian.little);
+  Uint8List get valueInBuffer => Uint8List(8)
+    ..buffer.asByteData().setUint64(0, this.value.toInt(), Endian.little);
+  Uint8List get hashTypeInBuffer => Uint8List(4)
+    ..buffer.asByteData().setUint32(0, hashType.value, Endian.little);
 
   String get text {
     if (this.addresses != null) {
@@ -121,5 +141,19 @@ class Input {
             this.script != null ? this.script : this.witness
       };
     return data;
+  }
+}
+
+class Converter {
+  // NOTE: calculate wei by 10^18
+  static BigInt btcInSatoshi = BigInt.from(1e8);
+
+  //1 BTC == 100,000,000 satoshi
+  static double toBtc(BigInt value) {
+    return value / btcInSatoshi;
+  }
+
+  static BigInt toSatoshi(Decimal btc) {
+    return BigInt.from((btc * Decimal.parse('100000000')).toDouble());
   }
 }

@@ -50,7 +50,7 @@ class _HomeScreenState extends State<HomeScreen> {
     super.didChangeDependencies();
   }
 
-  Widget resultWidget(dynamic result, Size screenSize) {
+  Widget resultWidget(List<String> result, Size screenSize) {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: screenSize.width * 0.1),
       child: Column(
@@ -64,14 +64,22 @@ class _HomeScreenState extends State<HomeScreen> {
                   Theme.of(context).textTheme.headline3.copyWith(fontSize: 24),
             ),
           ),
-          Container(
-              width: double.infinity,
-              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-              decoration: BoxDecoration(
-                  color: Color(0xfff5f5f5),
-                  border: Border.all(color: Colors.black54, width: 1),
-                  borderRadius: BorderRadius.circular(8)),
-              child: SelectableText('$result')),
+          Column(
+            children: result
+                .map(
+                  (e) => Container(
+                      margin: EdgeInsets.only(bottom: 16),
+                      width: double.infinity,
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                      decoration: BoxDecoration(
+                          color: Color(0xfff5f5f5),
+                          border: Border.all(color: Colors.black54, width: 1),
+                          borderRadius: BorderRadius.circular(8)),
+                      child: SelectableText('$e')),
+                )
+                .toList(),
+          ),
           SizedBox(
             height: 32,
           ),
@@ -79,7 +87,7 @@ class _HomeScreenState extends State<HomeScreen> {
             padding: EdgeInsets.symmetric(vertical: 16),
             alignment: Alignment.centerLeft,
             child: Text(
-              '\t${t('input_new_tx_hex')}',
+              t('input_new_tx_hex'),
               style:
                   Theme.of(context).textTheme.headline3.copyWith(fontSize: 24),
             ),
