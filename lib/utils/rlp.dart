@@ -1,12 +1,38 @@
 import 'dart:typed_data';
 
+import '../model/ethereum.transaction.model.dart';
+
 import 'utils.dart';
+import 'ecurve.dart' as ecurve;
+import 'extensions.dart';
 import 'package:convert/convert.dart';
 
 // import 'package:ethereum_util/src/utils.dart'
 //     show intToBuffer, isHexString, padToEven, stripHexPrefix;
 //Copy and pasted from the rlp nodejs library, translated to dart on a
 //best-effort basis.
+
+Uint8List encodeToRlp(
+    EthereumTransaction transaction, ecurve.MsgSignature signature) {
+  final list = [
+    transaction.nonce,
+    transaction.gasPrice,
+    transaction.gasLimit,
+  ];
+
+  if (transaction.to != null) {
+    list.add(transaction.to.getEthereumAddressBytes());
+  } else {
+    list.add('');
+  }
+
+  list..add(transaction.value)..add(transaction.data);
+
+  if (signature != null) {
+    list..add(signature.v)..add(signature.r)..add(signature.s);
+  }
+  return encode(list);
+}
 
 Uint8List encode(dynamic input) {
   if (input is List && !(input is Uint8List)) {

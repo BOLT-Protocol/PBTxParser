@@ -1,6 +1,12 @@
 import 'dart:convert';
+import 'dart:typed_data';
 
-import 'package:PBTxParser/utils/utils.dart';
+import 'package:pointycastle/pointycastle.dart';
+
+import '../utils/rlp.dart';
+import '../utils/hash.dart';
+import '../utils/ecurve.dart' as ecurve;
+import '../utils/utils.dart';
 import 'package:convert/convert.dart' show hex;
 
 import 'pb.contract.model.dart';
@@ -168,6 +174,7 @@ $FieldName_Detail: {
     List<int> recIds = [0, 1, 2, 3];
     int recId;
     int chainId;
+    List<Map<String, int>> result = [];
     if (chainIdV - 27 > recIds.last) {
       // chainIdV -35 = recId + chainId * 2
       for (int r in recIds) {
@@ -177,20 +184,54 @@ $FieldName_Detail: {
             chainId = c;
             this.chainId = chainId;
             this._signed = true;
-            print('r: $r');
-            print('c: $c');
+            result.add({"recId": r, "chainId": c});
             break;
           }
+          print('r: $r, c: $c');
         }
-        if (recId != null && chainId != null) break;
+        // if (recId != null && chainId != null) break;
       }
     } else {
+      // TODO if chainId is unknown
       recId = recIds.firstWhere((element) => element == chainIdV - 27);
       if (recId == null) {
         this._signed = false;
         return;
       }
     }
+    if (result.isEmpty) {
+      this._signed = false;
+      return;
+    }
+    // recoverRromSignature
+    print('result: $result');
+    List<BigInt> pubkeys = [];
+    List<Uint8List> hashs = [];
+    for (Map<String, int> data in result) {
+      Uint8List hash = generateTransactionHash(data["chainId"]);
+      BigInt pubkey = ecurve.recoverFromSignature(
+          data["recId"], ECSignature(this.r, this.s), hash);
+      print('pubkey: ${hex.encode(encodeBigInt(pubkey))}');
+      pubkeys.add(pubkey);
+      hashs.add(hash);
+      bool verified = ecurve.verify(hash, toBuffer([4] + encodeBigInt(pubkey)),
+          toBuffer(encodeBigInt(this.r) + encodeBigInt(this.s)));
+      print('verified: $verified');
+      if (verified) {
+        this._pubkey = '04${hex.encode(encodeBigInt(pubkey))}';
+      }
+    }
+  }
+
+  Uint8List generateTransactionHash(int chainId) {
+    Uint8List payload = encodeToRlp(
+        this, ecurve.MsgSignature(BigInt.zero, BigInt.zero, chainId));
+    print('payload: $payload');
+    Uint8List hash = keccak256(payload);
+    print('hash: $hash');
+    Uint8List hashBird = keccak256Bird(payload);
+    print('hashBird: $hashBird');
+    return hash;
   }
 }
 

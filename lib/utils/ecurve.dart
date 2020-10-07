@@ -54,9 +54,8 @@ ECPoint _decompressKey(BigInt xBN, bool yBit, ECCurve c) {
   return c.decodePoint(compEnc);
 }
 
-BigInt _recoverFromSignature(
-    int recId, ECSignature sig, Uint8List msg, ECCurve_secp256k1 params) {
-  final n = params.n;
+BigInt recoverFromSignature(int recId, ECSignature sig, Uint8List msg) {
+  final n = secp256k1.n;
   final i = BigInt.from(recId ~/ 2);
   final x = sig.r + (i * n);
 
@@ -64,7 +63,7 @@ BigInt _recoverFromSignature(
   final prime = decodeBigInt(EC_P);
   if (x.compareTo(prime) >= 0) return null;
 
-  final R = _decompressKey(x, (recId & 1) == 1, params.curve);
+  final R = _decompressKey(x, (recId & 1) == 1, secp256k1.curve);
   if (!(R * n).isInfinity) return null;
 
   final e = decodeBigInt(msg);
@@ -74,7 +73,7 @@ BigInt _recoverFromSignature(
   final srInv = (rInv * sig.s) % n;
   final eInvrInv = (rInv * eInv) % n;
 
-  final q = (params.G * eInvrInv) + (R * srInv);
+  final q = (secp256k1.G * eInvrInv) + (R * srInv);
 
   final bytes = q.getEncoded(false);
   return decodeBigInt(bytes.sublist(1));
@@ -250,7 +249,7 @@ MsgSignature sign(Uint8List hash, Uint8List x) {
   final publicKey = decodeBigInt(privateKeyToPublic(decodeBigInt(x)));
   var recId = -1;
   for (var i = 0; i < 4; i++) {
-    final k = _recoverFromSignature(i, sig, hash, secp256k1);
+    final k = recoverFromSignature(i, sig, hash);
     if (k == publicKey) {
       recId = i;
       break;

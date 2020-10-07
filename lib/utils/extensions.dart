@@ -136,6 +136,19 @@ extension StringExt on String {
     List<int> scriptPubKey = hex.decode(address.scriptPubKey);
     return scriptPubKey;
   }
+
+  bool isValidFormat() {
+    return RegExp(r"^[0-9a-fA-F]{40}$").hasMatch(stripHexPrefix(this));
+  }
+
+  Uint8List getEthereumAddressBytes() {
+    if (!this.isValidFormat()) {
+      throw ArgumentError.value(this, "address", "invalid address");
+    }
+    final String addr = stripHexPrefix(this).toLowerCase();
+    Uint8List buffer = Uint8List.fromList(hex.decode(addr));
+    return buffer;
+  }
 }
 
 extension Uint8ListExt on Uint8List {
