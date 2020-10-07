@@ -639,7 +639,12 @@ $FieldName_Detail: {
           hex.encode(witness),
           hex.encode(pubkey)
         ];
-        transaction.inputs[index].addresses = [pubkeyToP2wphAddress(pubkey)];
+        try {
+          transaction.inputs[index].addresses = [pubkeyToP2wphAddress(pubkey)];
+        } catch (e) {
+          print(e);
+          return null;
+        }
         transaction.inputs[index].type = ScriptType.P2WPKH;
         transaction.inputs[index].pubkey = hex.encode(pubkey);
         print('pointer:$pointer, address:${pubkeyToP2wphAddress(pubkey)}');
