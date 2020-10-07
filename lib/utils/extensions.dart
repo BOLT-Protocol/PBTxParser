@@ -1,9 +1,11 @@
-import 'dart:typed_data';
-import 'package:PBTxParser/constant/config.dart';
-import 'package:PBTxParser/utils/hash.dart';
 import 'package:convert/convert.dart' show hex;
+import 'dart:typed_data';
+
+import '../constant/config.dart';
+import '../model/cointype.model.dart';
 
 import 'base58.dart';
+import 'hash.dart';
 import 'segwit.dart';
 import 'utils.dart';
 
@@ -148,6 +150,22 @@ extension StringExt on String {
     final String addr = stripHexPrefix(this).toLowerCase();
     Uint8List buffer = Uint8List.fromList(hex.decode(addr));
     return buffer;
+  }
+
+  List<int> toXrpAccountId() {
+    // XRP Legacy Address to Account ID
+    if (!this.startsWith("r")) {
+      print("Not XRP legacy address");
+      return [];
+    }
+    var decodedData = Base58.xrp().decode(this);
+    if (decodedData != null &&
+        decodedData.length == 21 &&
+        decodedData.first == CoinType.xrp.xrpLegacyAddressPrefix)
+      return decodedData.sublist(1);
+
+    print("Not XRP legacy address");
+    return [];
   }
 }
 
@@ -303,6 +321,30 @@ extension ListExt<T> on List<int> {
     }
 
     return {'type': type, 'address': address};
+  }
+
+  List<int> xrpLengthPrefix() {
+    List<int> prefix = [];
+    if (this.length < 193)
+      prefix.add(this.length);
+    else if (this.length < 12481)
+      prefix.addAll([(this.length >> 8) & 0xFF, this.length & 0xFF]);
+    else if (this.length <= 918744)
+      prefix.addAll([
+        (this.length >> 16) & 0xFF,
+        (this.length >> 8) & 0xFF,
+        this.length & 0xFF
+      ]);
+    else
+      print("Invalid data length");
+    return prefix;
+  }
+
+  String xrpAccountIdToAddress() {
+    final List<int> hashPubKey =
+        Uint8List.fromList([CoinType.xrp.xrpLegacyAddressPrefix] + this);
+    final String address = Base58.xrp().encode(hashPubKey);
+    return address;
   }
 }
 
