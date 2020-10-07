@@ -9,19 +9,26 @@ import '../utils/utils.dart';
 class DecodeTransaction {
   static Future<List<String>> decode(String hex) async {
     Uint8List buffer;
-    if (isHexPrefixed(hex)) {
+    bool isHexPrefix;
+    try {
+      isHexPrefix = isHexPrefixed(hex);
+    } catch (e) {
+      print(e);
+      return ["Type: ${TransactionType.unknown.type}"];
+    }
+    if (isHexPrefix) {
       try {
         buffer = toBuffer(stripHexPrefix(hex));
       } catch (e) {
         print(e);
-        return [TransactionType.unknown.type];
+        return ["Type: ${TransactionType.unknown.type}"];
       }
     } else {
       try {
         buffer = toBuffer(hex);
       } catch (e) {
         print(e);
-        return [TransactionType.unknown.type];
+        return ["Type: ${TransactionType.unknown.type}"];
       }
     }
     var error;

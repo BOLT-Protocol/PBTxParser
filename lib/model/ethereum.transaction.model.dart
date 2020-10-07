@@ -57,7 +57,7 @@ $FieldName_Detail: {
       $FieldName_GasLimit: ${this.gasLimit},
       $FieldName_TO: ${this.to}
       $FieldName_Value: ${Converter.toEther(this.value, EthereumUnit.wei)} ETH,
-      $FieldName_Data: ${this.data},
+      $FieldName_Data: ${this.data.isEmpty ? null : this.data},
       $FieldName_V: ${this.v},
       $FieldName_R: 0x${hex.encode(encodeBigInt(this.r))},
       $FieldName_S: 0x${hex.encode(encodeBigInt(this.s))}
@@ -117,6 +117,8 @@ $FieldName_Detail: {
     try {
       data = hex.encode(rlpdecoded[5]);
       print('transaction.data: ${transaction.data}');
+      print('rlpdecoded[5]: ${rlpdecoded[5]}');
+      print('hex.encode(rlpdecoded[5]): ${hex.encode(rlpdecoded[5])}');
     } catch (e) {
       error = e;
     }
@@ -211,11 +213,12 @@ $FieldName_Detail: {
       Uint8List hash = generateTransactionHash(data["chainId"]);
       BigInt pubkey = ecurve.recoverFromSignature(
           data["recId"], ECSignature(this.r, this.s), hash);
-      print('pubkey: ${hex.encode(encodeBigInt(pubkey))}');
+      print('pubkey: $pubkey');
       pubkeys.add(pubkey);
       hashs.add(hash);
-      bool verified = ecurve.verify(hash, toBuffer([4] + encodeBigInt(pubkey)),
-          toBuffer(encodeBigInt(this.r) + encodeBigInt(this.s)));
+      Uint8List pubkeyL = toBuffer([4] + encodeBigInt(pubkey));
+      bool verified = ecurve.verify(
+          hash, pubkeyL, toBuffer(encodeBigInt(this.r) + encodeBigInt(this.s)));
       print('verified: $verified');
       if (verified) {
         this._pubkey = '04${hex.encode(encodeBigInt(pubkey))}';

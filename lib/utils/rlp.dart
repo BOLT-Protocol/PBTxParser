@@ -25,8 +25,11 @@ Uint8List encodeToRlp(
   } else {
     list.add('');
   }
+  print('transaction.data: ${transaction.data}');
 
-  list..add(transaction.value)..add(transaction.data);
+  list
+    ..add(transaction.value)
+    ..add(transaction.data.isEmpty ? Uint8List(0) : transaction.data);
 
   if (signature != null) {
     list..add(signature.v)..add(signature.r)..add(signature.s);
