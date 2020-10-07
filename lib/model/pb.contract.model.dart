@@ -164,8 +164,7 @@ class PBContractData {
           },
           $FieldName_CoinType: ${this.coinType},
           $FieldName_Amount: ${this.amount},
-          $FieldName_Address: ${this.address},
-        """;
+          $FieldName_Address: ${this.address},""";
         break;
       case PBContract.transfer:
         data = """
@@ -177,8 +176,7 @@ class PBContractData {
           $FieldName_CoinType: ${this.coinType},
           $FieldName_Amount: ${this.amount},
           $FieldName_Address: ${this.address},
-          $FieldName_Withdraw: ${this.withdraw},
-        """;
+          $FieldName_Withdraw: ${this.withdraw},""";
         break;
       case PBContract.swap:
         data = """
@@ -192,8 +190,7 @@ class PBContractData {
           $FieldName_To: ${this.toCoinType},
           $FieldName_ToAmount: ${this.toAmount},
           $FieldName_ToAddress: ${this.toAddress},
-          $FieldName_Withdraw: ${this.withdraw},
-        """;
+          $FieldName_Withdraw: ${this.withdraw},""";
         break;
       default:
         data = "";

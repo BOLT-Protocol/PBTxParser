@@ -63,6 +63,7 @@ class BitcoinTransaction {
   int lockTime;
   bool isSewgit;
   PBContractData contractData;
+  String data; // TODO if the data is not pbdata
   String _type = TransactionType.bitcoin.type;
   bool _signed;
   List<String> _signedPubkey;

@@ -25,28 +25,41 @@ class DecodeTransaction {
       }
     }
     var error;
+    List<dynamic> rlpdecoded;
     try {
-      List<dynamic> rlpdecoded = rlp.decode(buffer);
-      EthereumTransaction.decode(rlpdecoded);
-      return [TransactionType.ethereum.type];
+      rlpdecoded = rlp.decode(buffer);
     } catch (e) {
       print(e);
       error = e;
     }
-    BitcoinTransaction bitcoinTransaction;
-    if (error != null) {
+    if (error == null) {
+      EthereumTransaction ethereumTransaction =
+          EthereumTransaction.decode(rlpdecoded);
+      if (ethereumTransaction != null) {
+        return [
+          ethereumTransaction.type,
+          ethereumTransaction.signed,
+          ethereumTransaction.signedPubkey,
+          ethereumTransaction.detail,
+          ethereumTransaction.pbData
+        ];
+      }
+      return ["Type: ${TransactionType.unknown.type}"];
+    } else {
+      BitcoinTransaction bitcoinTransaction;
       bitcoinTransaction = await BitcoinTransaction.decode(hex);
+      if (bitcoinTransaction != null) {
+        return [
+          bitcoinTransaction.type,
+          bitcoinTransaction.signed,
+          bitcoinTransaction.signedPubkey,
+          bitcoinTransaction.detail,
+          bitcoinTransaction.pbData
+        ];
+      } else {
+        // TODO RIPPLE Transaction decode
+        return ["Type: ${TransactionType.unknown.type}"];
+      }
     }
-    if (bitcoinTransaction != null) {
-      return [
-        bitcoinTransaction.type,
-        bitcoinTransaction.signed.toString(),
-        bitcoinTransaction.signedPubkey,
-        bitcoinTransaction.detail,
-        bitcoinTransaction.pbData
-      ];
-    }
-    // TODO RIPPLE Transaction decode
-    return [TransactionType.unknown.type];
   }
 }
