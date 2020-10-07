@@ -31,6 +31,7 @@ Uint8List encodeToRlp(
   if (signature != null) {
     list..add(signature.v)..add(signature.r)..add(signature.s);
   }
+  print('encodeToRlp: $list');
   return encode(list);
 }
 

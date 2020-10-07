@@ -226,11 +226,9 @@ $FieldName_Detail: {
   Uint8List generateTransactionHash(int chainId) {
     Uint8List payload = encodeToRlp(
         this, ecurve.MsgSignature(BigInt.zero, BigInt.zero, chainId));
-    print('payload: $payload');
+
     Uint8List hash = keccak256(payload);
-    print('hash: $hash');
-    Uint8List hashBird = keccak256Bird(payload);
-    print('hashBird: $hashBird');
+    print('hash: ${hex.encode(hash)}');
     return hash;
   }
 }
