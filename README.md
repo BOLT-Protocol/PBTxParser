@@ -5,7 +5,7 @@ It is a Flutter Web Project
 ## Install Environment
 - ubuntu
 ```shell
-# Install flutter
+# Prepare flutter
 sudo snap install flutter --classic
 flutter upgrade
 flutter channel beta
