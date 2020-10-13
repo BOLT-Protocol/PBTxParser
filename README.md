@@ -2,6 +2,17 @@
 
 It is a Flutter Web Project
 
+## Install flutter
+- ubuntu
+```shell
+sudo snap install flutter --classic
+```
+
+## Clone project
+```shell
+git clone https://github.com/BOLT-Protocol/PBTxParser
+```
+
 ## Getting Started
 
 Flutter web is currently in beta stage. Thus, in order to create a Flutter app with web support, you need to be in the beta channel of Flutter.
