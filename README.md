@@ -2,13 +2,21 @@
 
 It is a Flutter Web Project
 
-## Install flutter
+## Install Environment
 - ubuntu
 ```shell
+# Install flutter
 sudo snap install flutter --classic
 flutter upgrade
 flutter channel beta
 flutter config --enable-web
+
+# Install snapcraft
+sudo snap install snapcraft --classic
+
+# Install LXD
+sudo snap install lxd
+sudo lxd init
 ```
 
 ## Deploy
