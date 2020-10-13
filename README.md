@@ -2,10 +2,10 @@
 
 It is a Flutter Web Project
 
-## Install Environment
+## Prepare Environment
 - ubuntu
 ```shell
-# Prepare flutter
+# Install flutter
 sudo snap install flutter --classic
 flutter upgrade
 flutter channel beta
