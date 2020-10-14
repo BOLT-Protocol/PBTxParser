@@ -28,12 +28,15 @@ class Footer extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      height: screenSize.height / 4,
+      height: screenSize.width > 900
+          ? screenSize.height / 4
+          : screenSize.height / 2.5,
       decoration: BoxDecoration(color: PBColors.footer_01),
       child: Container(
         padding: EdgeInsets.symmetric(
             horizontal: screenSize.width * 0.1, vertical: 32),
-        child: Row(
+        child: Flex(
+          direction: screenSize.width > 900 ? Axis.horizontal : Axis.vertical,
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [

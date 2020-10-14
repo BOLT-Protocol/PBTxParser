@@ -2,18 +2,19 @@ import 'package:flutter/material.dart';
 import 'dart:math' as math show pi;
 
 class Bar extends StatelessWidget {
-  final double screenWidth;
-  final double screenHeight;
+  final Size screenSize;
   final String title;
   Bar({
-    this.screenHeight,
-    this.screenWidth,
+    this.screenSize,
     this.title,
   });
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.1),
+      padding: EdgeInsets.symmetric(
+          horizontal: screenSize.width > 414
+              ? screenSize.width * 0.1
+              : screenSize.width * 0.05),
       child: Row(
         children: [
           Transform.rotate(
@@ -21,11 +22,17 @@ class Bar extends StatelessWidget {
               child: Icon(
                 Icons.send,
                 color: Theme.of(context).textTheme.headline1.color,
-                size: screenHeight * 0.05,
+                size: screenSize.height * 0.05,
               )),
           Text(
             title,
-            style: Theme.of(context).textTheme.headline1,
+            style: Theme.of(context).textTheme.headline1.copyWith(
+                fontSize: screenSize.width > 585
+                    ? Theme.of(context).textTheme.headline1.fontSize
+                    : screenSize.width > 414
+                        ? Theme.of(context).textTheme.headline2.fontSize
+                        : Theme.of(context).textTheme.headline4.fontSize),
+            overflow: TextOverflow.fade,
           ),
         ],
       ),

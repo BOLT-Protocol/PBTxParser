@@ -123,8 +123,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         children: [
                           Bar(
                             title: t('decode_a_tx'),
-                            screenHeight: screenSize.height,
-                            screenWidth: screenSize.width,
+                            screenSize: screenSize,
                           ),
                           SizedBox(
                             height: 32,
