@@ -18,7 +18,10 @@ class HTTPAgent {
   factory HTTPAgent() => _instance;
   Map<String, String> _defaultHeaders = {
     'Content-Type': 'application/json',
-    'Access-Control-Allow-Origin': '*',
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Credentials": "true",
+    "Access-Control-Allow-Headers": "authorization",
+    "Access-Control-Allow-Methods": "OPTIONS,HEAD,GET,PUT,POST,DELETE,PATCH"
   };
   // StreamController _status;
   Dio _dio;

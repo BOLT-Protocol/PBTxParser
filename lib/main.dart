@@ -61,7 +61,7 @@ class PBTxParser extends StatelessWidget {
             // title: I18n.t('pocket_band'), // Can not use translation in MaterialApp before i18n loaded
             title: 'Pocket Bank',
             theme: pbThemeData,
-            darkTheme: pbDarkThemeData,
+            darkTheme: pbThemeData,
             // home: HomePage(title: I18n.t('login')),
             routes: {
               '/': (context) => HomeScreen(),

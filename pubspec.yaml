@@ -50,6 +50,9 @@ dependencies:
   # bitcoin
   bs58check: ^1.0.1
 
+  # icons
+  font_awesome_flutter: ^8.10.0
+
 
   
 
