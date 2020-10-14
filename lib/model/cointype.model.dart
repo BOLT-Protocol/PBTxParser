@@ -1,11 +1,11 @@
 import '../constant/config.dart';
 
-enum CoinType { ripple, bitcoin, ethereum }
+enum CoinType { xrp, bitcoin, ethereum }
 
 extension CoinTypeExt on CoinType {
   String get string {
     switch (this) {
-      case CoinType.ripple:
+      case CoinType.xrp:
         return '80000090';
         break;
       case CoinType.bitcoin:
@@ -22,7 +22,7 @@ extension CoinTypeExt on CoinType {
 
   int get value {
     switch (this) {
-      case CoinType.ripple:
+      case CoinType.xrp:
         return 0x80000090;
       case CoinType.bitcoin:
         return 0x80000000;
@@ -39,7 +39,7 @@ extension CoinTypeExt on CoinType {
   String get network {
     if (!Config().isTestnet) return "mainnet";
     switch (this) {
-      case CoinType.ripple:
+      case CoinType.xrp:
       case CoinType.bitcoin:
         return "testnet";
         break;
@@ -50,5 +50,9 @@ extension CoinTypeExt on CoinType {
         return null;
         break;
     }
+  }
+
+  int get xrpLegacyAddressPrefix {
+    return 0;
   }
 }

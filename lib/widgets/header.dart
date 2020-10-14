@@ -19,7 +19,8 @@ class Header extends StatelessWidget {
       child: Container(
         padding: EdgeInsets.symmetric(
             horizontal: screenSize.width * 0.1, vertical: 15),
-        child: Row(
+        child: Flex(
+          direction: screenSize.width > 876 ? Axis.horizontal : Axis.vertical,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Row(
@@ -36,27 +37,28 @@ class Header extends StatelessWidget {
                 )
               ],
             ),
-            Row(
-              children: [
-                Text(
-                  'ScrollPosition: $scrollPosition',
-                  style: Theme.of(context).textTheme.headline3.copyWith(
-                      color: Theme.of(context).textTheme.headline3.color),
-                ),
-                SizedBox(width: 10),
-                Text(
-                  'Height: ${screenSize.height}',
-                  style: Theme.of(context).textTheme.headline3.copyWith(
-                      color: Theme.of(context).textTheme.headline3.color),
-                ),
-                SizedBox(width: 10),
-                Text(
-                  'Width: ${screenSize.width}',
-                  style: Theme.of(context).textTheme.headline3.copyWith(
-                      color: Theme.of(context).textTheme.headline3.color),
-                )
-              ],
-            ),
+            if (screenSize.width > 510)
+              Row(
+                children: [
+                  Text(
+                    'ScrollPosition: ${scrollPosition.toStringAsPrecision(4)}',
+                    style: Theme.of(context).textTheme.headline3.copyWith(
+                        color: Theme.of(context).textTheme.headline3.color),
+                  ),
+                  SizedBox(width: 10),
+                  Text(
+                    'Height: ${screenSize.height}',
+                    style: Theme.of(context).textTheme.headline3.copyWith(
+                        color: Theme.of(context).textTheme.headline3.color),
+                  ),
+                  SizedBox(width: 10),
+                  Text(
+                    'Width: ${screenSize.width}',
+                    style: Theme.of(context).textTheme.headline3.copyWith(
+                        color: Theme.of(context).textTheme.headline3.color),
+                  )
+                ],
+              ),
           ],
         ),
       ),
