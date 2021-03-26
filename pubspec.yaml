@@ -29,7 +29,7 @@ dependencies:
   # debug log
   logger: ^0.9.1
   # utils
-  intl: ^0.16.1
+  intl: ^0.17.0
   decimal: ^0.3.0
   url_launcher: ^5.7.2
   quiver: ^2.1.3

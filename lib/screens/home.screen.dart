@@ -112,7 +112,6 @@ class _HomeScreenState extends State<HomeScreen> {
             BlocBuilder<DecodeTransactionCubit, DecodeTransactionState>(
                 cubit: _decodeCubit,
                 builder: (context, state) {
-                  print('state: $state');
                   if (state is Decoded)
                     _widget = resultWidget(state.decodedTx, screenSize);
                   if (state is DecodeTransactionInitial) _widget = Container();
