@@ -27,6 +27,7 @@
 .pub-cache/
 .pub/
 /build/
+!**/build/web/**
 !**/build/**/librawtxhandler.so.64
 !**/build/**/librawtxhandler.so
 
